@@ -1,0 +1,44 @@
+{% extends 'layout.html' %}
+{% load tz %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+  {% if message %}
+    <div class="d-flex justify-content-center align-items-center" style="height: 100vh;">
+      <h2 class="text-center mt-n5">{{ message }}</h2>
+    </div>
+  {% endif %}
+
+  <div class="row">
+    {% for listing in listings %}
+      <div class="col-md-8 offset-md-2 mb-4">
+        <a href="{% url 'listing_detail' listing.my_id %}" class="text-decoration-none text-dark">
+        <div class="card shadow-sm border-{% if listing.deadline_passed and listing.percentage < 100 %}danger{% elif listing.percentage == 100 %}success{% elif listing.closing_soon and listing.percentage < 100 %}warning{% else %}light{% endif %}">
+            <div class="card-body">
+              <h4 class="card-title d-flex justify-content-between align-items-center">
+                {{ listing }}
+                {% if listing.deadline_passed and listing.percentage < 100 %}
+                  <span class="badge badge-pill badge-danger px-3 py-2">⏰ Deadline Passed</span>
+                {% elif listing.closing_soon and listing.percentage < 100 %}
+                  <span class="badge badge-pill badge-warning px-3 py-2">⚠️ Due Soon</span>
+                {% elif listing.percentage == 100 %}
+                  <span class="badge badge-pill badge-success px-3 py-2">✅ Completed</span>
+                {% endif %}
+              </h4>
+              <h6 class="card-subtitle mb-2 text-muted">
+                <strong>Deadline:</strong> {{ listing.deadline|localtime }}
+              </h6>
+              <h6 class="card-subtitle mb-2 text-muted">
+                <strong>Percentage:</strong> {{ listing.percentage }}%
+              </h6>
+              <p class="card-text">
+                <small class="text-muted">{{ listing.adjusted_timestamp|localtime }}</small>
+              </p>
+            </div>
+          </div>
+        </a>
+      </div>
+    {% endfor %}
+  </div>
+{% endblock %}
